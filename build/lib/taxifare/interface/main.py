@@ -159,7 +159,7 @@ def evaluate(
 
     # Query your BigQuery processed table and get data_processed using `get_data_with_cache`
     query =  f"""
-        SELECT * EXCEPT(pickup_datetime)
+        SELECT * EXCEPT(_0)
         FROM {GCP_PROJECT}.{BQ_DATASET}.processed_{DATA_SIZE}
         WHERE pickup_datetime BETWEEN '{min_date}' AND '{max_date}'
         ORDER BY pickup_datetime
@@ -176,10 +176,12 @@ def evaluate(
     if data_processed.shape[0] == 0:
         print("❌ No data to evaluate on")
         return None
+
     data_processed = data_processed.to_numpy()
 
     X_new = data_processed[:, :-1]
     y_new = data_processed[:, -1]
+
     metrics_dict = evaluate_model(model=model, X=X_new, y=y_new)
     mae = metrics_dict["mae"]
 
